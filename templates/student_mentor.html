@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}My mentor{% endblock %}
+{% block content %}
+<h1>My mentor</h1>
+{% if m %}<div class="card"><h2>{{ m.first_name }} {{ m.last_name }}</h2><p class="muted">{{ m.designation }} · mentor since {{ m.assigned_on }}</p><p>Email: <a href="mailto:{{ m.email }}">{{ m.email }}</a></p></div>
+{% else %}<p class="empty card">No mentor assigned yet. Ask the department office.</p>{% endif %}
+{% endblock %}

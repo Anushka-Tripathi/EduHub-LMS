@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% from '_report_macros.html' import table with context %}
+{% block title %}Attendance shortage{% endblock %}
+{% block content %}
+<p class="crumb"><a href="{{ url_for('admin_reports') }}">&larr; Reports</a></p>
+<div class="head">
+  <h1>Attendance shortage <small class="muted">below {{ threshold|int }}%</small></h1>
+  <a class="btn" href="{{ url_for('admin_report_shortage') }}?threshold={{ threshold }}&format=csv">Download CSV</a>
+</div>
+<form method="get" class="card form inline">
+  <label style="margin:0;display:flex;gap:10px;align-items:center">Threshold %
+    <input type="number" name="threshold" value="{{ threshold|int }}" min="1" max="100" style="width:100px"></label>
+  <button class="btn primary">Show</button>
+</form>
+{{ table(rs, 'Nobody is below this threshold.') }}
+<p class="hint">The result deduction column shows the marks that attendance currently costs in the course result (2 marks per started 5% below 75%, maximum 10).</p>
+{% endblock %}

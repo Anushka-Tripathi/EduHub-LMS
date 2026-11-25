@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% from '_icons.html' import ico %}
+{% block title %}Attendance{% endblock %}
+{% block content %}
+<div class="head"><div><h1>Attendance</h1><p class="muted">Current term · required {{ threshold }}%</p></div>
+  <div class="actions"><a class="btn primary" href="{{ url_for('attendance.scan') }}">Scan QR</a></div></div>
+<div class="tabs">
+  <a class="{{ 'on' if view == 'overall' }}" href="{{ url_for('attendance.student_tab', view='overall') }}">Overall</a>
+  <a class="{{ 'on' if view == 'daywise' }}" href="{{ url_for('attendance.student_tab', view='daywise') }}">Day-wise</a>
+</div>
+<div class="stats">
+  <div class="stat {{ 's6' if overall is not none and overall < threshold else 's3' }}"><div class="ico">{{ ico('clock') }}</div><div><b>{{ (overall ~ '%') if overall is not none else '-' }}</b><span>Overall attendance</span></div></div>
+  <div class="stat s1"><div class="ico">{{ ico('check') }}</div><div><b>{{ tot.present + tot.late }}</b><span>Attended ({{ tot.late }} late)</span></div></div>
+  <div class="stat s5"><div class="ico">{{ ico('alert') }}</div><div><b>{{ tot.absent }}</b><span>Absent</span></div></div>
+  <div class="stat s2"><div class="ico">{{ ico('file') }}</div><div><b>{{ tot.excused }}</b><span>Excused</span></div></div>
+</div>
+
+{% if view == 'overall' %}
+  {% if rows %}
+  <div class="grid2">
+    <div class="card"><div class="card-title"><h2>Breakdown</h2><small>all courses</small></div>{{ charts.donut }}</div>
+    <div class="card"><div class="card-title"><h2>By course</h2><small>red is below {{ threshold }}%</small></div>{{ charts.by_course }}</div>
+  </div>
+  {% if charts.trend %}<div class="card"><div class="card-title"><h2>Month by month</h2><small>attendance %</small></div>{{ charts.trend }}</div>{% endif %}
+  {% endif %}
+  <h2>Course-wise attendance</h2>
+  <div class="card flush scroll"><table>
+    <tr><th>Course</th><th>Held</th><th>Present</th><th>Late</th><th>Absent</th><th>Excused</th><th>Attendance</th><th>What it takes</th></tr>
+    {% for r in rows %}
+    <tr><td><b>{{ r.course_code }}</b><br><span class="muted">{{ r.course_title }}</span></td><td>{{ r.held }}{% if r.unmarked %} <small class="muted">({{ r.unmarked }} not marked)</small>{% endif %}</td>
+      <td>{{ r.present }}</td><td>{{ r.late }}</td><td>{{ r.absent }}</td><td>{{ r.excused }}</td>
+      <td>{% if r.pct is not none %}<span class="pill {{ 'ok' if r.pct >= threshold else 'bad' }}">{{ r.pct }}%</span>{% else %}-{% endif %}</td>
+      <td class="muted">{% if r.advice and r.advice.need is defined %}Attend the next <b>{{ r.advice.need }}</b> class(es) in a row to reach {{ threshold }}%
+          {% elif r.advice %}Can still miss <b>{{ r.advice.spare }}</b> class(es){% else %}-{% endif %}</td></tr>
+    {% else %}<tr><td colspan="8" class="empty">No classes recorded yet.</td></tr>{% endfor %}
+  </table></div>
+{% else %}
+  <div class="month-nav"><a class="btn small" href="{{ url_for('attendance.student_tab', view='daywise', month=month.prev) }}">&larr;</a>
+    <b>{{ month.label }}</b>
+    <a class="btn small" href="{{ url_for('attendance.student_tab', view='daywise', month=month.next) }}">&rarr;</a></div>
+  <div class="card">
+    <div class="cal-head">{% for d in ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] %}<span>{{ d }}</span>{% endfor %}</div>
+    {% for week in cal %}<div class="cal-week">{% for c in week %}
+      <div class="cal-day {{ c.cls }}" title="{{ c.holiday or c.tip }}"><i>{{ c.date.day }}</i>{% if c.holiday %}<em>{{ c.holiday[:14] }}</em>{% elif c.n %}<em>{{ c.n }} class{{ 'es' if c.n > 1 }}</em>{% endif %}</div>{% endfor %}</div>{% endfor %}
+    <p class="legend-row"><span class="chip present">all present</span> <span class="chip late">mixed</span> <span class="chip absent">absent</span> <span class="chip excused">holiday</span> <span class="chip none">not marked yet</span></p>
+  </div>
+  <h2>Day by day</h2>
+  {% for day, items in days %}
+  <div class="card flush"><table>
+    <tr><th colspan="5">{{ day.strftime('%A, %d %B %Y') }}</th></tr>
+    {% for i in items %}<tr><td>{{ i.start_time|hm }} – {{ i.end_time|hm }}</td><td><b>{{ i.course_code }}</b> <span class="muted">{{ i.course_title }}</span></td><td class="muted">{{ i.topic or '' }}</td>
+      <td><span class="chip {{ i.status or 'none' }}">{{ i.status or ('upcoming' if day > today else 'not marked') }}</span></td><td class="muted">{% if i.marked_via == 'qr' %}QR at {{ i.marked_time }}{% elif i.marked_via %}{{ i.marked_via }}{% endif %}</td></tr>{% endfor %}
+  </table></div>
+  {% else %}<p class="empty card">No classes this month.</p>{% endfor %}
+{% endif %}
+{% endblock %}

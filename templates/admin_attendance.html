@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Attendance{% endblock %}
+{% block content %}
+<h1>Attendance overview</h1>
+<div class="stats">
+  <div class="stat s6"><div class="ico">&#9888;</div><div><b>{{ shortage }}</b><span>Enrolments below {{ threshold }}%</span></div></div>
+  <div class="stat s1"><div class="ico">&#9776;</div><div><b>{{ offerings|length }}</b><span>Offerings this term</span></div></div>
+</div>
+<div class="grid2">
+  <div class="card"><div class="card-title"><h2>How attendance is marked</h2><small>all time</small></div>{{ charts.methods or '' }}</div>
+  <div class="card"><div class="card-title"><h2>QR scans today</h2><small>by outcome</small></div>
+    <table class="mini">{% for s in scans %}<tr><td>{{ s.outcome }}</td><td>{{ s.n }}</td></tr>{% else %}<tr><td class="empty">No scans today.</td></tr>{% endfor %}</table></div>
+</div>
+<h2>By course (lowest first)</h2>
+<div class="card flush scroll"><table>
+  <tr><th>Course</th><th>Section</th><th>Students</th><th>Marks</th><th>Attendance</th><th>Marked by QR</th><th></th></tr>
+  {% for o in offerings %}<tr><td><b>{{ o.course_code }}</b> <span class="muted">{{ o.title }}</span></td><td>{{ o.section_code }}</td><td>{{ o.students }}</td><td>{{ o.marks }}</td>
+    <td>{% if o.pct is not none %}<span class="pill {{ 'ok' if o.pct >= threshold else 'bad' }}">{{ o.pct }}%</span>{% else %}-{% endif %}</td>
+    <td>{{ (o.qr_share ~ '%') if o.qr_share is not none else '-' }}</td>
+    <td><a class="btn small" href="{{ url_for('admin_offering_detail', oid=o.offering_id) }}">Open</a></td></tr>{% endfor %}
+</table></div>
+<p class="hint">Need a list of students below the threshold? <a href="{{ url_for('admin_report_shortage') }}">Shortage report</a> (with CSV download).</p>
+{% endblock %}

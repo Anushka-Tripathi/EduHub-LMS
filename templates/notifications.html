@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Notifications{% endblock %}
+{% block content %}
+<div class="head"><h1>Notifications</h1>
+  <div class="actions">{% if session.user.role != 'student' %}<a class="btn" href="{{ url_for('portal.notify_new') }}">Send a notice</a>{% endif %}
+  <form method="post" action="{{ url_for('portal.notifications_read') }}">{{ csrf_field() }}<button class="btn">Mark all read</button></form></div></div>
+{% for n in items %}
+<div class="card note {{ '' if n.is_read else 'unread' }}">
+  <div class="head"><h3>{{ n.title }} <span class="pill">{{ n.category }}</span>{% if n.course_code %} <span class="pill">{{ n.course_code }}</span>{% endif %}</h3>
+    <small class="muted">{{ n.created_at.strftime('%d %b %Y, %H:%M') }}</small></div>
+  {% if n.body %}<p class="muted">{{ n.body }}</p>{% endif %}
+  {% if not n.is_read %}<form method="post" action="{{ url_for('portal.notifications_read') }}" class="inline">{{ csrf_field() }}<input type="hidden" name="id" value="{{ n.notification_id }}"><button class="btn small ghost">Mark read</button></form>{% endif %}
+</div>
+{% else %}<p class="empty card">Nothing in the last 90 days.</p>{% endfor %}
+{% endblock %}

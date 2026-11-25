@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Course registration{% endblock %}
+{% block content %}
+<h1>Course registration</h1><p class="muted">Seats, prerequisites and clashes are checked by the database when you enrol.</p>
+<div class="card flush scroll"><table><tr><th>Course</th><th>Section</th><th>Credits</th><th>Teacher</th><th>Seats</th><th></th></tr>
+  {% for r in rows %}<tr><td><b>{{ r.course_code }}</b><br><span class="muted">{{ r.title }}</span></td><td>{{ r.section_code }}</td><td>{{ r.credits }}</td><td>{{ r.teacher or '-' }}</td>
+    <td>{% set left = r.max_capacity - r.taken %}<span class="pill {{ 'ok' if left > 5 else ('warn' if left > 0 else 'bad') }}">{{ left if left > 0 else 'full' }}</span></td>
+    <td><form method="post" data-confirm="Enrol in {{ r.course_code }} section {{ r.section_code }}?">{{ csrf_field() }}<input type="hidden" name="offering_id" value="{{ r.offering_id }}"><button class="btn small primary" {{ 'disabled' if r.taken >= r.max_capacity }}>Enrol</button></form></td></tr>
+  {% else %}<tr><td colspan="6" class="empty">Nothing left to register for.</td></tr>{% endfor %}</table></div>
+{% endblock %}

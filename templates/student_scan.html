@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Scan QR{% endblock %}
+{% block content %}
+<h1>Scan to mark attendance</h1>
+<div class="grid2">
+  <div class="card">
+    <h2>Use the camera</h2>
+    <div id="scanner" data-ok="0"><video id="scan-video" playsinline muted hidden></video><p class="muted" id="scan-msg">Point your camera at the QR on the classroom screen.</p></div>
+    <div class="actions pad"><button class="btn primary" id="scan-start" type="button">Start camera</button></div>
+    <p class="hint">If your browser has no scanner, open your phone's normal camera app and scan; it opens this site and asks you to confirm.</p>
+  </div>
+  <div class="card">
+    <h2>Classes open for attendance</h2>
+    {% for c in open_now %}
+    <form method="post" action="{{ url_for('attendance.mark') }}" class="form inline scan-row">{{ csrf_field() }}
+      <input type="hidden" name="session_id" value="{{ c.session_id }}">
+      <div><b>{{ c.course_code }}</b> <span class="muted">{{ c.start_time|hm }} · closes in {{ c.minutes_left }} min</span></div>
+      {% if c.my_status in ('present','late') %}<span class="pill ok">{{ c.my_status }}</span>
+      {% else %}<input name="code" inputmode="numeric" pattern="[0-9 ]{6,7}" maxlength="7" placeholder="6-digit code" required autocomplete="off"><button class="btn primary">Mark</button>{% endif %}
+    </form>
+    {% else %}<p class="empty">No class has attendance open right now.</p>{% endfor %}
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='scan.js') }}"></script>{% endblock %}

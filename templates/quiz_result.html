@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Quiz result{% endblock %}
+{% block content %}
+<p class="crumb"><a href="{{ url_for('quiz.intro', qid=a.quiz_id) }}">{{ a.title }}</a> / result</p>
+<div class="card result"><div class="head"><h2>Attempt {{ a.attempt_no }}</h2>
+  <div class="big"><b>{{ a.score|int if a.score is not none and a.score == a.score|int else a.score }}</b> / {{ total|int }}</div></div>
+  <p class="muted">Submitted {{ a.submitted_on }}</p></div>
+{% if review %}
+<h2>Review</h2>
+{% for r in review %}<div class="card"><p><b>{{ loop.index }}.</b> {{ r.question_text }}</p>
+  <p>Your answer: <span class="pill {{ 'ok' if r.right_answer else 'bad' }}">{{ r.chosen or 'no answer' }}</span>{% if not r.right_answer %} · Correct: <b>{{ r.correct }}</b>{% endif %}</p></div>{% endfor %}
+{% elif not closed %}<p class="hint">Correct answers are shown after the quiz closes ({{ a.available_until }}).</p>{% endif %}
+{% endblock %}

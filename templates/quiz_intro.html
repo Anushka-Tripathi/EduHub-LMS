@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ quiz.title }}{% endblock %}
+{% block content %}
+<p class="crumb"><a href="{{ url_for('student_course', eid=enr.enrollment_id) }}">Back to course</a></p>
+<h1>{{ quiz.title }}</h1>
+<div class="card">
+  <div class="breakdown">
+    <div><span>Questions</span><b>{{ info.questions }}</b></div><div><span>Total marks</span><b>{{ info.total|int }}</b></div>
+    <div><span>Time limit</span><b>{{ quiz.time_limit_minutes }} min</b></div><div><span>Attempts allowed</span><b>{{ quiz.max_attempts }}</b></div>
+  </div>
+  <p class="muted">Open {{ quiz.available_from }} to {{ quiz.available_until }}. The clock runs on the server; once you start it keeps running even if you close the page. Your best attempt counts.</p>
+  {% if can_start %}
+    <form method="post" action="{{ url_for('quiz.start', qid=quiz.quiz_id) }}">{{ csrf_field() }}
+      <button class="btn primary">{{ 'Continue attempt' if attempts and attempts[-1].in_progress else 'Start attempt' }}</button></form>
+  {% elif state.before_open %}<p class="pill warn">Not open yet</p>{% elif state.closed %}<p class="pill bad">Closed</p>{% endif %}
+</div>
+<h2>Your attempts</h2>
+<div class="card flush"><table>
+  <tr><th>#</th><th>Started</th><th>Submitted</th><th>Score</th><th></th></tr>
+  {% for a in attempts %}<tr><td>{{ a.attempt_no }}</td><td>{{ a.attempted_on }}</td><td>{{ a.submitted_on or ('in progress' if a.in_progress else 'not submitted') }}</td>
+    <td>{% if a.score is not none %}{{ a.score|int if a.score == a.score|int else a.score }} / {{ info.total|int }}{% else %}-{% endif %}</td>
+    <td><a class="btn small" href="{{ url_for('quiz.take' if a.in_progress else 'quiz.result', aid=a.attempt_id) }}">{{ 'Continue' if a.in_progress else 'View' }}</a></td></tr>
+  {% else %}<tr><td colspan="5" class="empty">No attempts yet.</td></tr>{% endfor %}
+</table></div>
+{% endblock %}

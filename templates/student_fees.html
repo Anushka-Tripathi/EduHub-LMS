@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Fees{% endblock %}
+{% block content %}
+<h1>Fees</h1>
+<div class="stats"><div class="stat {{ 's6' if due else 's3' }}"><div class="ico">&#8377;</div><div><b>&#8377;{{ '{:,.0f}'.format(due) }}</b><span>Outstanding</span></div></div></div>
+<h2>Invoices</h2>
+<div class="card flush scroll"><table><tr><th>Description</th><th>Term</th><th>Amount</th><th>Paid</th><th>Balance</th><th>Due</th><th>Status</th></tr>
+  {% for i in invoices %}<tr><td>{{ i.description }}</td><td>{{ i.term_name }}</td><td>&#8377;{{ '{:,.0f}'.format(i.amount) }}</td><td>&#8377;{{ '{:,.0f}'.format(i.paid) }}</td><td>&#8377;{{ '{:,.0f}'.format(i.balance) }}</td><td>{{ i.due_date }}</td>
+    <td><span class="pill {{ {'paid':'ok','overdue':'bad','partial':'warn'}.get(i.status, '') }}">{{ i.status }}</span></td></tr>
+  {% else %}<tr><td colspan="7" class="empty">No invoices.</td></tr>{% endfor %}</table></div>
+<h2>Payments</h2>
+<div class="card flush"><table><tr><th>Date</th><th>For</th><th>Amount</th><th>Mode</th><th>Reference</th></tr>
+  {% for p in payments %}<tr><td>{{ p.paid_on.strftime('%d %b %Y') }}</td><td>{{ p.description }}</td><td>&#8377;{{ '{:,.0f}'.format(p.amount) }}</td><td>{{ p.mode }}</td><td><code>{{ p.reference_no }}</code></td></tr>
+  {% else %}<tr><td colspan="5" class="empty">No payments yet.</td></tr>{% endfor %}</table></div>
+<p class="hint">Online payment is not connected. Pay at the accounts office or by NEFT; the office records it here.</p>
+{% endblock %}

@@ -1,0 +1,35 @@
+# One command to run everything:   docker compose up --build
+# First start builds the database and the demo college (about a minute), then the site is on http://localhost:8000
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ADMIN_PASSWORD:-rootpass}
+    volumes: [dbdata:/var/lib/mysql]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_ADMIN_PASSWORD:-rootpass}"]
+      interval: 5s
+      retries: 30
+  setup:
+    build: .
+    depends_on: { db: { condition: service_healthy } }
+    environment: &env
+      DB_HOST: db
+      DB_NAME: elearning_db
+      DB_USER: lms_app
+      DB_PASSWORD: ${DB_PASSWORD:-change-this-app-password}
+      DB_APP_HOST: "%"
+      DB_ADMIN_USER: root
+      DB_ADMIN_PASSWORD: ${DB_ADMIN_PASSWORD:-rootpass}
+      SECRET_KEY: ${SECRET_KEY:-change-me-in-production-please}
+      UPLOAD_DIR: /app/uploads
+    volumes: [uploads:/app/uploads]
+    user: root
+    command: ["sh", "-c", "[ -f /app/uploads/.setup_done ] || (python setup_db.py --yes --with-data && touch /app/uploads/.setup_done)"]
+  web:
+    build: .
+    depends_on: { setup: { condition: service_completed_successfully } }
+    environment: *env
+    ports: ["8000:8000"]
+    volumes: [uploads:/app/uploads]
+volumes: { dbdata: {}, uploads: {} }

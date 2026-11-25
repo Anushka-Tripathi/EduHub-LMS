@@ -1,0 +1,8 @@
+.env
+__pycache__/
+.pytest_cache/
+logs/
+uploads/materials/
+docs/
+tests/
+credentials_*.csv

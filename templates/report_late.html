@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% from '_report_macros.html' import table with context %}
+{% block title %}Late submissions{% endblock %}
+{% block content %}
+<p class="crumb"><a href="{{ back }}">&larr; Back</a>{% if scope_title %} / {{ scope_title }}{% endif %}</p>
+<div class="head">
+  <h1>Late submissions</h1>
+  <a class="btn" href="{{ base }}?from={{ d_from }}&to={{ d_to }}{% if offering_id and offerings is not none %}&offering={{ offering_id }}{% endif %}&format=csv">Download CSV</a>
+</div>
+<form method="get" action="{{ base }}" class="card form inline">
+  <label style="margin:0">From <input type="date" name="from" value="{{ d_from }}" required></label>
+  <label style="margin:0">To <input type="date" name="to" value="{{ d_to }}" required></label>
+  {% if offerings is not none %}
+  <select name="offering">
+    <option value="">All courses</option>
+    {% for o in offerings %}<option value="{{ o.offering_id }}" {{ 'selected' if offering_id == o.offering_id }}>{{ o.label }}</option>{% endfor %}
+  </select>
+  {% endif %}
+  <button class="btn primary">Show</button>
+</form>
+
+{{ table(late, 'No late submissions in this period.', hide=['days_late', 'max_marks', 'due_date']) }}
+<p class="hint">Penalty = 5% of the marks for every started day late, at most 50%. It is shown for information and is not applied to course results.</p>
+
+<h2>Students late two or more times</h2>
+{{ table(repeat, 'Nobody was late more than once in this period.') }}
+{% endblock %}

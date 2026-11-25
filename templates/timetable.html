@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Timetable{% endblock %}
+{% block content %}
+<h1>Weekly timetable</h1>
+<div class="tt">
+  {% for d, name, slots in grid %}
+  <div class="tt-day {{ 'today' if d == today }}"><h3>{{ name }}</h3>
+    {% for s in slots %}<div class="tt-slot {{ s.slot_type }}"><b>{{ s.start_time|hm }} – {{ s.end_time|hm }}</b><br>{{ s.course_code }} <small>{{ s.section_code }}</small><br>
+      <span class="muted">{{ s.title }}</span><br><small>Room {{ s.room }} · {{ s.slot_type }}{% if s.teacher %} · {{ s.teacher }}{% endif %}</small></div>
+    {% else %}<p class="muted">Free</p>{% endfor %}
+  </div>{% endfor %}
+</div>
+{% endblock %}

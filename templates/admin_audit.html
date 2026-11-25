@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Audit log{% endblock %}
+{% block content %}
+<h1>Audit log</h1><p class="muted">Append-only. The application cannot edit or delete these rows.</p>
+<form method="get" class="card form inline"><select name="action"><option value="">any action</option>{% for a in actions %}<option {{ 'selected' if a == action }}>{{ a }}</option>{% endfor %}</select>
+  <input name="entity" placeholder="entity (e.g. submission)" value="{{ entity }}"><input name="actor" placeholder="actor" value="{{ actor }}"><button class="btn">Filter</button></form>
+<div class="card flush scroll"><table><tr><th>When</th><th>Who</th><th>Action</th><th>Entity</th><th>Detail</th><th>IP</th></tr>
+  {% for r in rows %}<tr><td>{{ r.occurred_at.strftime('%d %b %H:%M:%S') }}</td><td>{{ r.actor }}</td><td><span class="pill">{{ r.action }}</span></td><td>{{ r.entity }} {{ r.entity_id or '' }}</td><td class="muted">{{ r.detail or '' }}</td><td class="muted">{{ r.ip_address or '' }}</td></tr>
+  {% else %}<tr><td colspan="6" class="empty">Nothing logged yet.</td></tr>{% endfor %}</table></div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% from '_report_macros.html' import cell with context %}
+{% block title %}Report card{% endblock %}
+{% block content %}
+<p class="crumb no-print"><a href="{{ back }}">&larr; Back</a></p>
+<div class="head no-print">
+  <h1>Report card</h1>
+  <div class="actions">
+    {% if terms|length > 1 %}
+    <form method="get" action="{{ base }}" class="inline">
+      <select name="term" data-autosubmit>
+        {% for t in terms %}<option value="{{ t.term_id }}" {{ 'selected' if term_id == t.term_id or (not term_id and header.term_name == t.term_name) }}>{{ t.term_name }}</option>{% endfor %}
+      </select>
+    </form>
+    {% endif %}
+    <a class="btn" href="{{ base }}?{% if term_id %}term={{ term_id }}&{% endif %}format=csv">Download CSV</a>
+    <button class="btn primary" type="button" data-print>Print</button>
+  </div>
+</div>
+
+<div class="card slip">
+  <div class="slip-head">
+    <div>
+      <div class="slip-brand"><i class="logo"></i>EduHub LMS</div>
+      <h2>Student Report Card</h2>
+      <p class="muted">{{ header.term_name }}</p>
+    </div>
+    <div class="slip-id">
+      <b>{{ header.student }}</b><br>
+      <span class="muted">{{ header.roll_number }}</span><br>
+      <span class="muted">{{ header.program_name }} · Semester {{ header.current_semester }}</span>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>Course</th><th>Credits</th><th>Assignments</th><th>Quizzes</th><th>Attendance</th><th>Deduction</th><th>Final</th><th>Grade</th><th>Points</th></tr>
+    {% for r in lines.rows %}
+    <tr>
+      <td>{{ r.course_code }}<br><small class="muted">{{ r.course }}</small></td>
+      <td>{{ r.credits }}</td>
+      <td>{{ cell('assignment_pct', r.assignment_pct) }}</td>
+      <td>{{ cell('quiz_pct', r.quiz_pct) }}</td>
+      <td>{{ cell('attendance_pct', r.attendance_pct) }}</td>
+      <td>{% if r.attendance_deduction and r.attendance_deduction > 0 %}<span class="neg">-{{ r.attendance_deduction|int }}</span>{% else %}0{% endif %}</td>
+      <td><b>{{ cell('final_percentage', r.final_percentage) }}</b></td>
+      <td>{{ cell('grade', r.grade) }}</td>
+      <td>{{ r.grade_points if r.grade_points is not none else '-' }}</td>
+    </tr>
+    {% else %}<tr><td colspan="9" class="empty">No courses this term.</td></tr>{% endfor %}
+  </table>
+
+  <div class="slip-totals">
+    <div><span>Credits registered</span><b>{{ totals.credits_registered or 0 }}</b></div>
+    <div><span>Term GPA{% if totals.credits_graded != totals.credits_registered %} (graded courses){% endif %}</span><b>{{ totals.term_gpa if totals.term_gpa is not none else '-' }}</b></div>
+    <div><span>CGPA (finished courses)</span><b>{{ totals.cgpa if totals.cgpa is not none else '-' }}</b></div>
+    <div><span>Credits in CGPA</span><b>{{ totals.cgpa_credits or 0 }}</b></div>
+  </div>
+  <p class="hint">Grades for a running term are provisional until the term is finalised. Final % = weighted assignments and quizzes minus the attendance deduction.</p>
+</div>
+{% endblock %}

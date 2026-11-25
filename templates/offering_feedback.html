@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Feedback{% endblock %}
+{% block content %}
+<p class="crumb"><a href="{{ url_for('instructor_offering', oid=off.offering_id) }}">{{ course.course_code }}</a> / feedback</p>
+<h1>Student feedback <small class="muted">{{ avg.n }} response(s)</small></h1>
+{% if chart %}<div class="card"><div class="card-title"><h2>Average rating</h2><small>out of 5</small></div>{{ chart }}</div>{% endif %}
+{% for c in comments %}<div class="card"><p>{{ c.comment }}</p><small class="muted">{{ c.submitted_on.strftime('%d %b %Y') }}</small></div>{% else %}<p class="empty card">No comments yet.</p>{% endfor %}
+{% endblock %}

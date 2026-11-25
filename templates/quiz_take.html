@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ a.title }}{% endblock %}
+{% block content %}
+<div class="head"><h1>{{ a.title }}</h1><div class="timer" id="timer" data-seconds="{{ seconds_left }}">--:--</div></div>
+<form method="post" id="quiz-form" action="{{ url_for('quiz.submit', aid=a.attempt_id) }}">{{ csrf_field() }}
+  {% for q in questions %}
+  <div class="card question">
+    <p><b>{{ loop.index }}.</b> {{ q.question_text }} <small class="muted">({{ q.marks|int if q.marks == q.marks|int else q.marks }} mark{{ 's' if q.marks != 1 }})</small></p>
+    {% for o in q.options %}<label class="opt-row"><input type="radio" name="q_{{ q.question_id }}" value="{{ o.option_id }}"> <span>{{ o.option_text }}</span></label>{% endfor %}
+  </div>
+  {% endfor %}
+  <div class="actions"><button class="btn primary" data-confirm-btn="Submit your answers? You cannot change them afterwards.">Submit answers</button></div>
+</form>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='quiz.js') }}"></script>{% endblock %}

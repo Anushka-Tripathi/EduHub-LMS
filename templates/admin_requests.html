@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Requests{% endblock %}
+{% block content %}
+<div class="head"><h1>Student requests</h1>
+  <div class="tabs">{% for s in ['open','in_progress','resolved','rejected','all'] %}<a class="{{ 'on' if status == s }}" href="{{ url_for('portal.admin_requests', status=s) }}">{{ s.replace('_', ' ') }}</a>{% endfor %}</div></div>
+{% for r in rows %}<div class="card"><div class="head"><h3>{{ r.subject }} <span class="pill">{{ r.category.replace('_', ' ') }}</span></h3><small class="muted">{{ r.roll_number }} · {{ r.student }} · {{ r.created_on.strftime('%d %b %Y') }}</small></div>
+  <p class="muted">{{ r.description }}</p>
+  <form method="post" class="form inline">{{ csrf_field() }}<input type="hidden" name="request_id" value="{{ r.request_id }}">
+    <select name="status">{% for s in ['open','in_progress','resolved','rejected'] %}<option {{ 'selected' if r.status == s }}>{{ s }}</option>{% endfor %}</select>
+    <input name="response" placeholder="Response to the student" value="{{ r.response or '' }}" style="min-width:280px"><button class="btn primary">Save</button></form></div>
+{% else %}<p class="empty card">No requests here.</p>{% endfor %}
+{% endblock %}

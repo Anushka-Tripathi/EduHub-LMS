@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}My mentees{% endblock %}
+{% block content %}
+<h1>My mentees <small class="muted">{{ rows|length }}</small></h1>
+<div class="card flush scroll"><table><tr><th>Roll no.</th><th>Student</th><th>Email</th><th>Attendance</th><th>Open requests</th></tr>
+  {% for r in rows %}<tr><td>{{ r.roll_number }}</td><td>{{ r.student }}</td><td>{{ r.email }}</td>
+    <td>{% if r.attendance is not none %}<span class="pill {{ 'ok' if r.attendance >= 75 else 'bad' }}">{{ r.attendance }}%</span>{% else %}-{% endif %}</td><td>{{ r.open_requests }}</td></tr>
+  {% else %}<tr><td colspan="5" class="empty">No mentees assigned.</td></tr>{% endfor %}</table></div>
+{% endblock %}

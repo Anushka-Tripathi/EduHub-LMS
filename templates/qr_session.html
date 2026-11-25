@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}QR attendance{% endblock %}
+{% block content %}
+<p class="crumb"><a href="{{ url_for('attendance.instructor_overview') if session.user.role == 'instructor' else url_for('admin_dashboard') }}">Attendance</a> / QR</p>
+<div class="head">
+  <div><h1>{{ cs.course_code }} · {{ cs.title }}</h1>
+  <p class="muted">Section {{ cs.section_code }} · {{ cs.session_date }} · {{ cs.start_time|hm }} – {{ cs.end_time|hm }}{% if cs.topic %} · {{ cs.topic }}{% endif %}</p></div>
+  <a class="btn" href="{{ url_for('instructor_attendance', cid=cs.session_id) }}">Mark manually instead</a>
+</div>
+
+<div id="qr-app" data-sid="{{ cs.session_id }}" data-state="{{ url_for('attendance.qr_state', sid=cs.session_id) }}" data-img="{{ url_for('attendance.qr_svg', sid=cs.session_id) }}">
+  <div class="grid2">
+    <div class="card qr-card">
+      <div id="qr-closed" {% if window and window.is_open %}hidden{% endif %}>
+        {% if not is_today %}<p class="empty">QR attendance can only be opened on the day of the class ({{ cs.session_date }}).</p>
+        {% else %}
+        <h2>Open attendance</h2>
+        <form method="post" action="{{ url_for('attendance.qr_open', sid=cs.session_id) }}" class="form">{{ csrf_field() }}
+          <div class="row">
+            <label>Keep open for (minutes) <input type="number" name="minutes" value="20" min="1" max="180"></label>
+            <label>Count as late after (minutes) <input type="number" name="late_after" value="10" min="0" max="180"></label>
+          </div>
+          <div class="actions"><button class="btn primary">Show QR code</button></div>
+        </form>
+        <p class="hint">The code on screen changes every {{ step }} seconds, so a photo of it stops working quickly.</p>
+        {% endif %}
+      </div>
+      <div id="qr-open" {% if not (window and window.is_open) %}hidden{% endif %}>
+        <img id="qr-img" alt="Attendance QR code" width="320" height="320">
+        <div class="qr-code" id="qr-code">------</div>
+        <div class="muted">Students scan this, or open <b>Scan QR</b> and type the code. New code in <b id="qr-next">--</b>s</div>
+        <p class="muted">Closes in <b id="qr-closes">--</b> · marked late in <b id="qr-late">--</b></p>
+        <form method="post" action="{{ url_for('attendance.qr_close', sid=cs.session_id) }}" class="actions pad">{{ csrf_field() }}
+          <button class="btn">Close window</button>
+          <button class="btn danger" name="finish" value="1" data-confirm-btn="Close and mark everyone without a scan as absent?">Close and mark the rest absent</button>
+        </form>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><h2>Live</h2><small id="qr-count">0 scanned</small></div>
+      <div class="meter"><div class="bar"><i id="qr-bar" style="width:0%"></i></div></div>
+      <p class="muted" id="qr-detail">present 0 · late 0 · of 0 enrolled</p>
+      <table class="mini"><thead><tr><th>Time</th><th>Roll no.</th><th>Student</th><th>Status</th></tr></thead><tbody id="qr-recent"><tr><td colspan="4" class="empty">Nobody yet.</td></tr></tbody></table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='qr.js') }}"></script>{% endblock %}

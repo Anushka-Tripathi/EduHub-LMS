@@ -1,0 +1,12 @@
+course_code,module_number,title
+AEC006,1,Reading Comprehension and Grammar
+ETCCCC303,1,"Arrays, Hashing and Two Pointers"
+ETCCDA302,1,Asymptotic Analysis and Recurrences
+ETCCDA302,2,"Divide and Conquer, Greedy"
+ETCCHW305,1,Boolean Logic and the ALU
+ETCCML301,1,Linear and Logistic Regression
+ETCCML301,2,Model Evaluation and Overfitting
+ETCCMS304,1,Relational Model and ER Design
+ETCCMS304,2,"SQL: DDL, DML and Joins"
+ETCCMS304,3,Normalization and Functional Dependencies
+ETCCMS304,4,"Transactions, Indexing and Security"

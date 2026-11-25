@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Timetable{% endblock %}
+{% block content %}
+<p class="crumb"><a href="{{ url_for('admin_offering_detail', oid=off.offering_id) }}">{{ off.course_code }}</a> / timetable</p>
+<h1>{{ off.course_code }} · timetable</h1>
+<div class="card flush"><table><tr><th>Day</th><th>Time</th><th>Room</th><th>Type</th><th></th></tr>
+  {% for s in slots %}<tr><td>{{ days[s.day_of_week - 1] }}</td><td>{{ s.start_time|hm }} – {{ s.end_time|hm }}</td><td>{{ s.room }}</td><td>{{ s.slot_type }}</td>
+    <td><form method="post" class="inline">{{ csrf_field() }}<input type="hidden" name="action" value="delete"><input type="hidden" name="slot_id" value="{{ s.slot_id }}"><button class="btn small danger">Remove</button></form></td></tr>
+  {% else %}<tr><td colspan="5" class="empty">No weekly slots yet.</td></tr>{% endfor %}</table></div>
+<details class="card" open><summary><b>+ Add a weekly slot</b></summary>
+  <form method="post" class="form">{{ csrf_field() }}<input type="hidden" name="action" value="add">
+    <div class="row"><label>Day <select name="day">{% for d in days %}<option value="{{ loop.index }}">{{ d }}</option>{% endfor %}</select></label>
+      <label>Start <input type="time" name="start_time" value="09:00" required></label><label>End <input type="time" name="end_time" value="10:00" required></label></div>
+    <div class="row"><label>Room <input name="room" required maxlength="30"></label>
+      <label>Type <select name="slot_type"><option>lecture</option><option>lab</option><option>tutorial</option></select></label></div>
+    <div class="actions"><button class="btn primary">Add slot</button></div></form></details>
+<h2>Generate class sessions</h2>
+<form method="post" class="card form inline">{{ csrf_field() }}<input type="hidden" name="action" value="generate">
+  <label>From <input type="date" name="from" value="{{ off.start_date }}" required></label><label>To <input type="date" name="to" value="{{ off.end_date }}" required></label>
+  <button class="btn primary">Create sessions</button></form>
+<p class="hint">One session is created for every weekly slot between the dates, skipping holidays. Existing sessions are left alone.</p>
+{% endblock %}

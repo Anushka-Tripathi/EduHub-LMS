@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Mark attendance{% endblock %}
+{% block content %}
+<div class="card center narrow">
+  <h1>Mark my attendance</h1>
+  <p><b>{{ cs.course_code }} · {{ cs.title }}</b><br><span class="muted">{{ cs.session_date }} · {{ cs.start_time|hm }} – {{ cs.end_time|hm }}</span></p>
+  <form method="post" action="{{ url_for('attendance.mark') }}">{{ csrf_field() }}
+    <input type="hidden" name="session_id" value="{{ cs.session_id }}"><input type="hidden" name="code" value="{{ code }}">
+    <button class="btn primary block">I am in this class, mark me present</button>
+  </form>
+  <p class="hint">Your name, time and network address are recorded with the mark.</p>
+</div>
+{% endblock %}

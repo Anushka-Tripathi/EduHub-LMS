@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Assessments{% endblock %}
+{% block content %}
+<div class="head"><h1>Assessment hub</h1><a class="btn" href="{{ url_for('student_report_card') }}">Report card</a></div>
+<h2>Quizzes</h2>
+<div class="card flush scroll"><table><tr><th>Course</th><th>Quiz</th><th>Window</th><th>Limit</th><th>Attempts</th><th>Best</th><th></th></tr>
+  {% for q in quizzes %}{% set open = q.available_from <= now <= q.available_until %}
+  <tr><td><b>{{ q.course_code }}</b></td><td>{{ q.title }}</td><td>{{ q.available_from.strftime('%d %b %H:%M') }} → {{ q.available_until.strftime('%d %b %H:%M') }}</td><td>{{ q.time_limit_minutes }} min</td>
+    <td>{{ q.attempts }}/{{ q.max_attempts }}</td><td>{% if q.best is not none %}{{ q.best|int }}/{{ q.total|int }}{% else %}-{% endif %}</td>
+    <td><a class="btn small {{ 'primary' if open }}" href="{{ url_for('quiz.intro', qid=q.quiz_id) }}">{{ 'Take' if open else 'View' }}</a></td></tr>
+  {% else %}<tr><td colspan="7" class="empty">No quizzes.</td></tr>{% endfor %}</table></div>
+<h2>Assignments</h2>
+<div class="card flush scroll"><table><tr><th>Course</th><th>Assignment</th><th>Due</th><th>Status</th></tr>
+  {% for a in assignments %}<tr><td><b>{{ a.course_code }}</b></td><td><a href="{{ url_for('student_course', eid=a.enrollment_id) }}">{{ a.title }}</a></td><td>{{ a.due_date.strftime('%d %b %H:%M') }}</td>
+    <td>{% if a.marks_obtained is not none %}<span class="pill ok">{{ a.marks_obtained }}/{{ a.max_marks|int }}</span>{% elif a.submission_id %}<span class="pill warn">awaiting grade</span>{% elif a.due_date < now %}<span class="pill bad">missed</span>{% else %}<span class="pill">pending</span>{% endif %}</td></tr>
+  {% else %}<tr><td colspan="4" class="empty">No assignments.</td></tr>{% endfor %}</table></div>
+{% endblock %}

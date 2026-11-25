@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ quiz.title }}{% endblock %}
+{% block content %}
+<p class="crumb"><a href="{{ url_for('instructor_offering', oid=offering.offering_id) }}">Back to course</a></p>
+<h1>{{ quiz.title }} <small class="muted">results</small></h1>
+<div class="stats"><div class="stat s1"><div class="ico">&#9776;</div><div><b>{{ attempts|length }}</b><span>Attempts</span></div></div>
+  <div class="stat s3"><div class="ico">&#9733;</div><div><b>{{ avg if avg is not none else '-' }}</b><span>Average score (of {{ total|int }})</span></div></div></div>
+<h2>Question analysis</h2>
+<div class="card flush"><table><tr><th>Question</th><th>Answered</th><th>Correct</th></tr>
+  {% for q in per_q %}<tr><td>{{ q.question_text }}</td><td>{{ q.answered }}</td><td>{% if q.pct_correct is not none %}<span class="pill {{ 'ok' if q.pct_correct >= 60 else 'warn' }}">{{ q.pct_correct|int }}%</span>{% else %}-{% endif %}</td></tr>{% endfor %}</table></div>
+<h2>Attempts</h2>
+<div class="card flush scroll"><table><tr><th>Roll no.</th><th>Student</th><th>#</th><th>Started</th><th>Submitted</th><th>Score</th></tr>
+  {% for a in attempts %}<tr><td>{{ a.roll_number }}</td><td>{{ a.student }}</td><td>{{ a.attempt_no }}</td><td>{{ a.attempted_on }}</td><td>{{ a.submitted_on or '-' }}</td><td>{{ a.score if a.score is not none else '-' }}</td></tr>
+  {% else %}<tr><td colspan="6" class="empty">No attempts yet.</td></tr>{% endfor %}</table></div>
+{% endblock %}

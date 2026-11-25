@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Send a notice{% endblock %}
+{% block content %}
+<h1>Send a notice</h1>
+<form method="post" class="card form">{{ csrf_field() }}
+  <div class="row">
+    <label>To <select name="audience" id="aud">
+      {% if session.user.role == 'admin' %}<option value="all">Everyone</option><option value="students">All students</option><option value="instructors">All instructors</option>{% endif %}
+      <option value="offering">Students and staff of one course</option></select></label>
+    <label>Course <select name="offering_id">{% for o in offerings %}<option value="{{ o.offering_id }}">{{ o.course_code }} {{ o.section_code }}</option>{% endfor %}</select></label>
+    <label>Category <select name="category"><option value="general">General</option><option value="academic">Academic</option><option value="exam">Exam</option><option value="fees">Fees</option><option value="event">Event</option></select></label>
+  </div>
+  <label>Title <input name="title" required maxlength="150"></label>
+  <label>Message <textarea name="body" rows="4" maxlength="2000"></textarea></label>
+  <div class="actions"><button class="btn primary">Send</button></div>
+</form>
+{% endblock %}

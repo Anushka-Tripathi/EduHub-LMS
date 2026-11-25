@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Holidays{% endblock %}
+{% block content %}
+<h1>Holidays &amp; breaks</h1>
+<div class="card flush"><table><tr><th>Date</th><th>Day</th><th>Occasion</th><th>Type</th>{% if session.user.role == 'admin' %}<th></th>{% endif %}</tr>
+  {% for h in rows %}<tr class="{{ 'muted' if h.holiday_date < today }}"><td>{{ h.holiday_date.strftime('%d %b %Y') }}</td><td>{{ h.holiday_date.strftime('%A') }}</td><td>{{ h.name }}</td><td><span class="pill">{{ h.kind.replace('_', ' ') }}</span></td>
+    {% if session.user.role == 'admin' %}<td><form method="post" action="{{ url_for('portal.holidays_edit') }}" class="inline">{{ csrf_field() }}<input type="hidden" name="action" value="delete"><input type="hidden" name="holiday_id" value="{{ h.holiday_id }}"><button class="btn small danger">Remove</button></form></td>{% endif %}</tr>
+  {% else %}<tr><td colspan="5" class="empty">No holidays listed.</td></tr>{% endfor %}</table></div>
+{% if session.user.role == 'admin' %}
+<form method="post" action="{{ url_for('portal.holidays_edit') }}" class="card form inline">{{ csrf_field() }}
+  <input type="date" name="holiday_date" required><input name="name" placeholder="Occasion" required maxlength="100">
+  <select name="kind"><option value="public">public</option><option value="institute">institute</option><option value="exam_break">exam break</option></select><button class="btn primary">Add</button></form>
+{% endif %}
+{% endblock %}

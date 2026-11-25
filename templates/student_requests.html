@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Request centre{% endblock %}
+{% block content %}
+<h1>Request centre</h1>
+<details class="card" {{ 'open' if not rows }}><summary><b>+ New request or grievance</b></summary>
+  <form method="post" class="form">{{ csrf_field() }}
+    <div class="row"><label>Category <select name="category">{% for k, v in categories %}<option value="{{ k }}">{{ v }}</option>{% endfor %}</select></label><label>Subject <input name="subject" required maxlength="150"></label></div>
+    <label>Details <textarea name="description" rows="4" maxlength="3000"></textarea></label><div class="actions"><button class="btn primary">Submit</button></div></form></details>
+<h2>My requests</h2>
+{% for r in rows %}<div class="card"><div class="head"><h3>{{ r.subject }} <span class="pill">{{ r.category.replace('_', ' ') }}</span></h3>
+  <span class="pill {{ {'resolved':'ok','rejected':'bad','in_progress':'warn'}.get(r.status, '') }}">{{ r.status.replace('_', ' ') }}</span></div>
+  <p class="muted">{{ r.description }}</p><small class="muted">Raised {{ r.created_on.strftime('%d %b %Y') }}</small>
+  {% if r.response %}<p><b>Response:</b> {{ r.response }}</p>{% endif %}</div>{% else %}<p class="empty card">Nothing raised yet.</p>{% endfor %}
+{% endblock %}

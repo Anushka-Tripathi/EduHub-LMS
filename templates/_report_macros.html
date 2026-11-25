@@ -1,0 +1,24 @@
+{% macro cell(col, v) -%}
+  {%- if v is none %}<span class="muted">-</span>
+  {%- elif col == 'attendance_pct' %}<span class="pill {{ 'ok' if v|float >= 75 else 'bad' }}">{{ v }}%</span>
+  {%- elif col == 'standing' %}<span class="pill {{ 'ok' if v == 'OK' else 'bad' }}">{{ v }}</span>
+  {%- elif col == 'grade' %}<span class="grade {{ grade_class(v) }}">{{ v }}</span>
+  {%- elif col == 'penalty_pct' or col == 'final_percentage' or col == 'assignment_pct' or col == 'quiz_pct' %}{{ v }}%
+  {%- elif v.hour is defined %}{{ v.strftime('%d %b %H:%M') }}
+  {%- elif v.strftime is defined %}{{ v.strftime('%d %b %Y') }}
+  {%- else %}{{ v }}{% endif %}
+{%- endmacro %}
+
+{% macro table(rs, empty='No rows for these filters.', hide=[]) %}
+{% set cols = rs.columns|reject('in', hide)|list %}
+<div class="card flush">
+<table class="rt">
+  <tr>{% for c in cols %}<th>{{ c|replace('marks_after_penalty', 'after penalty')|replace('marks_obtained', 'marks')|replace('roll_number', 'roll no.')|replace('_pct', ' %')|replace('_', ' ') }}</th>{% endfor %}</tr>
+  {% for row in rs.rows %}
+  <tr>{% for c in cols %}<td>{{ cell(c, row[c]) }}</td>{% endfor %}</tr>
+  {% else %}
+  <tr><td class="empty" colspan="{{ cols|length or 1 }}">{{ empty }}</td></tr>
+  {% endfor %}
+</table>
+</div>
+{% endmacro %}

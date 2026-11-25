@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% from '_icons.html' import ico %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+<div class="hero">
+  <h1>Reports</h1>
+  <p>Attendance, late submissions and student report cards. Each one is a stored procedure in MySQL; export any table as CSV.</p>
+</div>
+<div class="cards">
+  <div class="card report-tile">
+    <div class="stat s2" style="box-shadow:none;border:0;padding:0"><div class="ico">{{ ico('clock') }}</div><div><h3 style="margin:0">Monthly attendance summary</h3><span>Per student per course, one month</span></div></div>
+    <form method="get" action="{{ url_for('admin_report_attendance') }}" class="form" style="margin-top:14px">
+      <label>Month <input type="month" name="month" value=""></label>
+      <div class="actions"><button class="btn primary">Open report</button></div>
+    </form>
+  </div>
+  <div class="card report-tile">
+    <div class="stat s6" style="box-shadow:none;border:0;padding:0"><div class="ico">{{ ico('alert') }}</div><div><h3 style="margin:0">Attendance shortage</h3><span>Active students below a threshold</span></div></div>
+    <form method="get" action="{{ url_for('admin_report_shortage') }}" class="form" style="margin-top:14px">
+      <label>Below (%) <input type="number" name="threshold" value="75" min="1" max="100" step="1"></label>
+      <div class="actions"><button class="btn primary">Open report</button></div>
+    </form>
+  </div>
+  <div class="card report-tile">
+    <div class="stat s3" style="box-shadow:none;border:0;padding:0"><div class="ico">{{ ico('file') }}</div><div><h3 style="margin:0">Late submissions</h3><span>With days late and penalty</span></div></div>
+    <p class="actions" style="margin-top:14px"><a class="btn primary" href="{{ url_for('admin_report_late') }}">Open report</a></p>
+  </div>
+  <div class="card report-tile">
+    <div class="stat s4" style="box-shadow:none;border:0;padding:0"><div class="ico">{{ ico('award') }}</div><div><h3 style="margin:0">Student report card</h3><span>Courses, grades, term GPA and CGPA</span></div></div>
+    <form method="get" action="{{ url_for('admin_report_card_lookup') }}" class="form" style="margin-top:14px">
+      <label>Roll number <input name="roll" placeholder="2501730001" required></label>
+      <div class="actions"><button class="btn primary">Open report card</button></div>
+    </form>
+  </div>
+</div>
+{% endblock %}

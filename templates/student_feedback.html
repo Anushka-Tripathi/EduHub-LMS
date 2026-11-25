@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Course feedback{% endblock %}
+{% block content %}
+<h1>Course feedback</h1><p class="muted">Your feedback is shown to the instructor without your name.</p>
+{% for r in rows %}<div class="card"><div class="head"><h3>{{ r.course_code }} · {{ r.title }}</h3>
+  {% if r.submitted_on %}<span class="pill ok">given {{ r.submitted_on.strftime('%d %b') }}</span>{% endif %}</div>
+  {% if not r.submitted_on %}
+  <form method="post" class="form">{{ csrf_field() }}<input type="hidden" name="enrollment_id" value="{{ r.enrollment_id }}">
+    <div class="row">{% for key, label in [('rating_content','Course content'),('rating_teaching','Teaching'),('rating_assessment','Assessments')] %}
+      <label>{{ label }} <select name="{{ key }}">{% for n in [5,4,3,2,1] %}<option value="{{ n }}">{{ n }} {{ '(best)' if n == 5 }}</option>{% endfor %}</select></label>{% endfor %}</div>
+    <label>Comments <textarea name="comment" rows="2" maxlength="1000"></textarea></label><div class="actions"><button class="btn primary">Submit</button></div></form>{% endif %}</div>
+{% else %}<p class="empty card">No current courses.</p>{% endfor %}
+{% endblock %}

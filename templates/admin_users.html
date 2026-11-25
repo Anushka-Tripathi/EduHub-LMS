@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}User accounts{% endblock %}
+{% block content %}
+<h1>User accounts</h1>
+<form method="get" class="card form inline"><input name="q" placeholder="Name or username" value="{{ q }}"><select name="role"><option value="">any role</option>{% for r in ['student','instructor','admin'] %}<option {{ 'selected' if role == r }}>{{ r }}</option>{% endfor %}</select><button class="btn">Search</button></form>
+<div class="card flush scroll"><table><tr><th>Username</th><th>Name</th><th>Role</th><th>Last login</th><th>Status</th><th></th></tr>
+  {% for u in rows %}<tr><td><code>{{ u.username }}</code></td><td>{{ u.name }}</td><td>{{ u.role }}</td><td>{{ u.last_login or 'never' }}</td>
+    <td><span class="pill {{ 'ok' if u.is_active else 'bad' }}">{{ 'active' if u.is_active else 'disabled' }}</span>{% if u.must_change_password %} <span class="pill warn">must change password</span>{% endif %}</td>
+    <td class="actions"><form method="post" data-confirm="Create a temporary password for {{ u.username }}?">{{ csrf_field() }}<input type="hidden" name="user_id" value="{{ u.user_id }}"><input type="hidden" name="action" value="reset"><button class="btn small">Reset password</button></form>
+      <form method="post">{{ csrf_field() }}<input type="hidden" name="user_id" value="{{ u.user_id }}"><input type="hidden" name="action" value="toggle"><button class="btn small {{ 'danger' if u.is_active }}">{{ 'Disable' if u.is_active else 'Enable' }}</button></form></td></tr>
+  {% else %}<tr><td colspan="6" class="empty">No accounts match.</td></tr>{% endfor %}</table></div>
+{% endblock %}

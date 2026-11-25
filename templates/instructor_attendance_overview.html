@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Attendance{% endblock %}
+{% block content %}
+<h1>Attendance</h1>
+<h2>Today's classes</h2>
+<div class="card flush"><table>
+  <tr><th>Time</th><th>Course</th><th>Topic</th><th>Marked</th><th></th></tr>
+  {% for s in today %}<tr><td>{{ s.start_time|hm }} – {{ s.end_time|hm }}</td><td><b>{{ s.course_code }}</b> {{ s.section_code }}</td><td>{{ s.topic or '-' }}</td>
+    <td>{{ s.marked }}{% if s.qr_open %} <span class="pill ok">QR open</span>{% endif %}</td>
+    <td><a class="btn small primary" href="{{ url_for('attendance.qr_page', sid=s.session_id) }}">QR attendance</a> <a class="btn small" href="{{ url_for('instructor_attendance', cid=s.session_id) }}">Manual</a></td></tr>
+  {% else %}<tr><td colspan="5" class="empty">No classes today.</td></tr>{% endfor %}
+</table></div>
+<h2>My courses this term</h2>
+<div class="card flush scroll"><table>
+  <tr><th>Course</th><th>Students</th><th>Classes held</th><th>Average attendance</th><th></th></tr>
+  {% for o in offerings %}<tr><td><b>{{ o.course_code }}</b> {{ o.section_code }}<br><span class="muted">{{ o.title }}</span></td><td>{{ o.students }}</td><td>{{ o.held }}</td>
+    <td>{% if o.pct is not none %}<span class="pill {{ 'ok' if o.pct >= 75 else 'bad' }}">{{ o.pct }}%</span>{% else %}-{% endif %}</td>
+    <td><a class="btn small" href="{{ url_for('instructor_offering', oid=o.offering_id) }}">Open course</a>
+        <a class="btn small" href="{{ url_for('instructor_report_attendance', oid=o.offering_id) }}">Report</a></td></tr>{% endfor %}
+</table></div>
+{% endblock %}

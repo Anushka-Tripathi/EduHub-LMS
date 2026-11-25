@@ -1,0 +1,10 @@
+.env
+__pycache__/
+*.pyc
+logs/*.log*
+uploads/materials/*
+!uploads/materials/.gitkeep
+credentials_*.csv
+.pytest_cache/
+venv/
+.venv/
